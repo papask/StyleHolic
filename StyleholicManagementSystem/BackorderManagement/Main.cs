@@ -91,10 +91,10 @@ namespace BackorderManagement
         {
             dataGridView1.Rows.Clear();
 
-            dataGridView1.Rows.Add("ET0812", "white", "4");
-            dataGridView1.Rows.Add("ET0813", "red", "4");
-            dataGridView1.Rows.Add("ET0814", "blue", "4");
-            dataGridView1.Rows.Add("ET0815", "black", "4");
+            dataGridView1.Rows.Add(false, "ET0812", "white", "4", "Y");
+            dataGridView1.Rows.Add(false, "ET0813", "red", "4", "N");
+            dataGridView1.Rows.Add(false, "ET0814", "blue", "4", "N");
+            dataGridView1.Rows.Add(false, "ET0815", "black", "4", "Y");
 
             dataGridView1.Rows[0].Cells[0].Selected = false;
         }
