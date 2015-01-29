@@ -22,6 +22,10 @@ namespace BackorderManagement
 
         public void InitBind()
         {
+            StyleManage smForm = new StyleManage();
+            smForm.MdiParent = this;
+            smForm.Show();
+
             GetBackorderInformation gbiForm = new GetBackorderInformation();
             gbiForm.MdiParent = this;
             gbiForm.Show();
@@ -29,6 +33,7 @@ namespace BackorderManagement
             BackorderManage bmForm = new BackorderManage();
             bmForm.MdiParent = this;
             bmForm.Show();
+
         }
 
         private void Main_MdiChildActivate(object sender, EventArgs e)
