@@ -131,7 +131,7 @@ namespace BackorderManagement
             if (cbStoreList.SelectedIndex == 0)
                 strRetVal = "sh";
             else if (cbStoreList.SelectedIndex == 1)
-                strRetVal = "ame";
+                strRetVal = "ugf";
             else
                 strRetVal = "ray";
 
@@ -186,22 +186,29 @@ namespace BackorderManagement
 
                 StyleInfo si = dm.GetStyleInfoFromStyleID(strSelectedStyleNo);
 
-                MemoryStream ms = new MemoryStream(si.StyleImage);
-                Image returnImage = Image.FromStream(ms);
-
-                if (returnImage != null)
+                if (si.StyleImage != null)
                 {
-                    pictureBox1.Image = returnImage;
+                    MemoryStream ms = new MemoryStream(si.StyleImage);
+                    Image returnImage = Image.FromStream(ms);
+
+                    if (returnImage != null)
+                    {
+                        pictureBox1.Image = returnImage;
+                    }
+                    else
+                    {
+                        myRequest = (HttpWebRequest)WebRequest.Create(si.ImageUrl);
+                        myRequest.Method = "GET";
+                        myResponse = (HttpWebResponse)myRequest.GetResponse();
+                        bmp = new System.Drawing.Bitmap(myResponse.GetResponseStream());
+                        myResponse.Close();
+
+                        pictureBox1.Image = bmp;
+                    }
                 }
                 else
                 {
-                    myRequest = (HttpWebRequest)WebRequest.Create(si.ImageUrl);
-                    myRequest.Method = "GET";
-                    myResponse = (HttpWebResponse)myRequest.GetResponse();
-                    bmp = new System.Drawing.Bitmap(myResponse.GetResponseStream());
-                    myResponse.Close();
-
-                    pictureBox1.Image = bmp;
+                    pictureBox1.Image = null;
                 }
 
                 txtStyleNo.Text = si.StyleNo;
@@ -372,6 +379,36 @@ namespace BackorderManagement
             }
             catch (Exception ex)
             { }
+        }
+
+        private void txtSearch_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                dvStyleList.Rows.Clear();
+
+                if (!String.IsNullOrEmpty(cbSearchType.Text) && !String.IsNullOrEmpty(txtSearch.Text))
+                {
+                    MySqlDataManager dm = new MySqlDataManager(strConnectString);
+                    DataTable dt = dm.GetStyleListFromSearchType(GetStoreId(), cbSearchType.SelectedIndex.ToString(), txtSearch.Text);
+
+                    if (dt != null && dt.Rows.Count > 0)
+                    {
+                        for (int i = 0; i < dt.Rows.Count; i++)
+                        {
+                            dvStyleList.Rows.Add(
+                                dt.Rows[i]["StyleNo"].ToString()
+                                );
+                        }
+
+                        dvStyleList.Rows[0].Cells[0].Selected = false;
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Type search value.");
+                }
+            }
         }
     }
 }

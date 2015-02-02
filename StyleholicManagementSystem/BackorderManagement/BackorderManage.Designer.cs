@@ -29,11 +29,15 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle8 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             this.dvStyleList = new System.Windows.Forms.DataGridView();
+            this.Column9 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column10 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column22 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.label7 = new System.Windows.Forms.Label();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.dvRemainItemList = new System.Windows.Forms.DataGridView();
+            this.Column23 = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.Column8 = new System.Windows.Forms.DataGridViewImageColumn();
             this.Column13 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -74,9 +78,6 @@
             this.cmStyleStatus = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.outOfStockToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.onSaleToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.Column9 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column10 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column22 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.dvStyleList)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dvRemainItemList)).BeginInit();
@@ -111,6 +112,25 @@
             this.dvStyleList.MouseClick += new System.Windows.Forms.MouseEventHandler(this.dvStyleList_MouseClick);
             this.dvStyleList.MouseDown += new System.Windows.Forms.MouseEventHandler(this.dvStyleList_MouseDown);
             // 
+            // Column9
+            // 
+            this.Column9.HeaderText = "Vender";
+            this.Column9.Name = "Column9";
+            this.Column9.ReadOnly = true;
+            // 
+            // Column10
+            // 
+            this.Column10.HeaderText = "Style No.";
+            this.Column10.Name = "Column10";
+            this.Column10.ReadOnly = true;
+            // 
+            // Column22
+            // 
+            this.Column22.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
+            this.Column22.HeaderText = "InStock";
+            this.Column22.Name = "Column22";
+            this.Column22.Width = 70;
+            // 
             // label7
             // 
             this.label7.AutoSize = true;
@@ -141,6 +161,7 @@
             this.dvRemainItemList.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.dvRemainItemList.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dvRemainItemList.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.Column23,
             this.Column8,
             this.Column13,
             this.Column1,
@@ -149,29 +170,40 @@
             this.Column7,
             this.Column12,
             this.Column14});
-            dataGridViewCellStyle8.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle8.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle8.Font = new System.Drawing.Font("Gulim", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            dataGridViewCellStyle8.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle8.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle8.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle8.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.dvRemainItemList.DefaultCellStyle = dataGridViewCellStyle8;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Gulim", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.dvRemainItemList.DefaultCellStyle = dataGridViewCellStyle1;
             this.dvRemainItemList.Location = new System.Drawing.Point(591, 312);
             this.dvRemainItemList.MultiSelect = false;
             this.dvRemainItemList.Name = "dvRemainItemList";
             this.dvRemainItemList.ReadOnly = true;
             this.dvRemainItemList.RowHeadersVisible = false;
             this.dvRemainItemList.RowTemplate.Height = 150;
-            this.dvRemainItemList.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.dvRemainItemList.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
             this.dvRemainItemList.Size = new System.Drawing.Size(562, 301);
             this.dvRemainItemList.TabIndex = 65;
+            this.dvRemainItemList.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dvRemainItemList_CellContentClick);
             this.dvRemainItemList.MouseClick += new System.Windows.Forms.MouseEventHandler(this.dvRemainItemList_MouseClick);
             this.dvRemainItemList.MouseDown += new System.Windows.Forms.MouseEventHandler(this.dvRemainItemList_MouseDown);
+            // 
+            // Column23
+            // 
+            this.Column23.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
+            this.Column23.Frozen = true;
+            this.Column23.HeaderText = "";
+            this.Column23.Name = "Column23";
+            this.Column23.ReadOnly = true;
+            this.Column23.Width = 50;
             // 
             // Column8
             // 
             this.Column8.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
+            this.Column8.Frozen = true;
             this.Column8.HeaderText = "Image";
             this.Column8.ImageLayout = System.Windows.Forms.DataGridViewImageCellLayout.Stretch;
             this.Column8.Name = "Column8";
@@ -255,7 +287,7 @@
             this.dvCustomerList.Name = "dvCustomerList";
             this.dvCustomerList.ReadOnly = true;
             this.dvCustomerList.RowHeadersVisible = false;
-            this.dvCustomerList.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.dvCustomerList.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
             this.dvCustomerList.Size = new System.Drawing.Size(323, 221);
             this.dvCustomerList.TabIndex = 63;
             this.dvCustomerList.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dvCustomerList_CellClick);
@@ -404,6 +436,7 @@
             this.txtSearchStyle.Name = "txtSearchStyle";
             this.txtSearchStyle.Size = new System.Drawing.Size(178, 21);
             this.txtSearchStyle.TabIndex = 72;
+            this.txtSearchStyle.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtSearchStyle_KeyDown);
             // 
             // btnSearchStyle
             // 
@@ -520,7 +553,7 @@
             // outOfStockToolStripMenuItem
             // 
             this.outOfStockToolStripMenuItem.Name = "outOfStockToolStripMenuItem";
-            this.outOfStockToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.outOfStockToolStripMenuItem.Size = new System.Drawing.Size(141, 22);
             this.outOfStockToolStripMenuItem.Text = "Out of stock";
             this.outOfStockToolStripMenuItem.Click += new System.EventHandler(this.outOfStockToolStripMenuItem_Click);
             // 
@@ -530,25 +563,6 @@
             this.onSaleToolStripMenuItem.Size = new System.Drawing.Size(141, 22);
             this.onSaleToolStripMenuItem.Text = "In Stock";
             this.onSaleToolStripMenuItem.Click += new System.EventHandler(this.onSaleToolStripMenuItem_Click);
-            // 
-            // Column9
-            // 
-            this.Column9.HeaderText = "Vender";
-            this.Column9.Name = "Column9";
-            this.Column9.ReadOnly = true;
-            // 
-            // Column10
-            // 
-            this.Column10.HeaderText = "Style No.";
-            this.Column10.Name = "Column10";
-            this.Column10.ReadOnly = true;
-            // 
-            // Column22
-            // 
-            this.Column22.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            this.Column22.HeaderText = "InStock";
-            this.Column22.Name = "Column22";
-            this.Column22.Width = 70;
             // 
             // BackorderManage
             // 
@@ -603,14 +617,6 @@
         private System.Windows.Forms.Button btnReload;
         private System.Windows.Forms.Button btnPrint;
         private System.Drawing.Printing.PrintDocument printDocument1;
-        private System.Windows.Forms.DataGridViewImageColumn Column8;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column13;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column1;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column5;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column6;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column7;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column12;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column14;
         private System.Windows.Forms.DataGridView dvRemainQuantityList;
         private System.Windows.Forms.ContextMenuStrip cmPacked;
         private System.Windows.Forms.ToolStripMenuItem packedToolStripMenuItem;
@@ -641,6 +647,15 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn Column9;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column10;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column22;
+        private System.Windows.Forms.DataGridViewCheckBoxColumn Column23;
+        private System.Windows.Forms.DataGridViewImageColumn Column8;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column13;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column5;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column6;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column7;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column12;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column14;
 
 
 

@@ -255,14 +255,19 @@ namespace BackorderManagement
                             {
                                 foreach (HtmlElement item_orderitem_img in item_orderitem_tr.GetElementsByTagName("img"))
                                 {
-                                    if (item_orderitem_img.Id.IndexOf("imgProduct") > 0)
+                                    try
                                     {
-                                        string strTempIMGtag = item_orderitem_img.OuterHtml;
-                                        int nStart = strTempIMGtag.ToLower().IndexOf("src=\"") + 5;
-                                        int nEnd = strTempIMGtag.ToLower().IndexOf(".jpg") + 4;
-                                        
-                                        strImageURL = strTempIMGtag.Substring(nStart, nEnd - nStart);
+                                        if (item_orderitem_img.Id.IndexOf("imgProduct") > 0)
+                                        {
+                                            string strTempIMGtag = item_orderitem_img.OuterHtml;
+                                            int nStart = strTempIMGtag.ToLower().IndexOf("src=\"") + 5;
+                                            int nEnd = strTempIMGtag.ToLower().IndexOf(".jpg") + 4;
+
+                                            strImageURL = strTempIMGtag.Substring(nStart, nEnd - nStart);
+                                        }
                                     }
+                                    catch (Exception ex)
+                                    { }
                                 }
 
                                 foreach (HtmlElement item_orderitem_span in item_orderitem_tr.GetElementsByTagName("span"))
@@ -542,7 +547,7 @@ namespace BackorderManagement
                                 #endregion
 
                                 MySqlDataManager dm = new MySqlDataManager(strConnectString);
-                                if (!dm.ExistOrderInfo(strOrderNumber, strColorName))
+                                if (!dm.ExistOrderInfo(strOrderNumber, strStyleName, strColorName, strCustomerID))
                                 {//strOrderNumber, strColorName
                                     dgResult.Rows.Add(strVenderCode, strVenderName, strStyleName, strColorName, strSizeInfo, strTotalQty, strTotalValue, strBillingAddr, strShipment, strOrderNumber, strImageURL, strCustomerID);
 

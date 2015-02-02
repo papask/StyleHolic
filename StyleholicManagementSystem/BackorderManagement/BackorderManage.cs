@@ -141,18 +141,33 @@ namespace BackorderManagement
                                 break;
                         }
 
-                        MemoryStream ms = new MemoryStream((byte[])row["StyleImage"]);
-                        Image returnImage = Image.FromStream(ms);
+                        if (row["StyleImage"].ToString() != "")
+                        {
+                            MemoryStream ms = new MemoryStream((byte[])row["StyleImage"]);
+                            Image returnImage = Image.FromStream(ms);
 
-                        dvRemainItemList.Rows.Add(returnImage,
-                                                    row["VenderName"].ToString(),
-                                                    row["StyleNo"].ToString(),
-                                                    row["Color"].ToString(),
-                                                    row["Quantity"].ToString(),
-                                                    strItemStatus,
-                                                    row["OrderID"].ToString(),
-                                                    Convert.ToDateTime(row["OrderDate"]).ToShortDateString()
-                                                    );
+                            dvRemainItemList.Rows.Add(false, returnImage,
+                                                        row["VenderName"].ToString(),
+                                                        row["StyleNo"].ToString(),
+                                                        row["Color"].ToString(),
+                                                        row["Quantity"].ToString(),
+                                                        strItemStatus,
+                                                        row["OrderID"].ToString(),
+                                                        Convert.ToDateTime(row["OrderDate"]).ToShortDateString()
+                                                        );
+                        }
+                        else
+                        {
+                            dvRemainItemList.Rows.Add(false, null,
+                                                        row["VenderName"].ToString(),
+                                                        row["StyleNo"].ToString(),
+                                                        row["Color"].ToString(),
+                                                        row["Quantity"].ToString(),
+                                                        strItemStatus,
+                                                        row["OrderID"].ToString(),
+                                                        Convert.ToDateTime(row["OrderDate"]).ToShortDateString()
+                                                        );
+                        }
                     }
 
                     dvRemainItemList.Rows[0].Cells[0].Selected = false;
@@ -257,7 +272,9 @@ namespace BackorderManagement
                     }
                 }
                 catch (Exception ex)
-                { }
+                {
+                    pictureBox1.Image = null;
+                }
 
                 DataTable dtRemainQuantity = dm.GetRemainQuantityByColorFromStyleID(strSelectedStyleNo);
 
@@ -330,6 +347,21 @@ namespace BackorderManagement
                 
                 // remain item list
                 GetRemainItemList();
+            }
+        }
+
+        private void dvRemainItemList_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.ColumnIndex == 0)
+            {
+                if (dvRemainItemList.SelectedRows[0].Cells[0].Value.ToString() == "True")
+                {
+                    dvRemainItemList.SelectedRows[0].Cells[0].Value = false;
+                }
+                else
+                {
+                    dvRemainItemList.SelectedRows[0].Cells[0].Value = true;
+                }
             }
         }
 
@@ -533,7 +565,17 @@ namespace BackorderManagement
         {
             try
             {
-                strSelectedCustomerId = dvCustomerList.SelectedRows[0].Cells[4].Value.ToString();
+                if (dvCustomerList.Rows.Count > 0 && dvCustomerList.SelectedRows.Count == 0)
+                {
+                    strCurrentCustomer = dvCustomerList.Rows[0].Cells[1].Value.ToString();
+                    strSelectedCustomerId = dvCustomerList.Rows[0].Cells[4].Value.ToString();
+                }
+                else
+                {
+                    strCurrentCustomer = dvCustomerList.SelectedRows[0].Cells[1].Value.ToString();
+                    strSelectedCustomerId = dvCustomerList.SelectedRows[0].Cells[4].Value.ToString();
+                }
+                
 
                 // remain item list
                 GetRemainItemList();
@@ -670,9 +712,13 @@ namespace BackorderManagement
 
                 // Calculating Total Widths
                 iTotalWidth = 0;
+                int nColumnCount = 0;
                 foreach (DataGridViewColumn dgvGridCol in dvRemainItemList.Columns)
                 {
-                    iTotalWidth += dgvGridCol.Width;
+                    if (nColumnCount != 0)
+                        iTotalWidth += dgvGridCol.Width;
+
+                    nColumnCount++;
                 }
             }
             catch (Exception ex)
@@ -684,7 +730,7 @@ namespace BackorderManagement
         private void printDocument1_PrintPage(object sender, System.Drawing.Printing.PrintPageEventArgs e)
         {
             try
-            {
+            {   
                 //Set the left margin
                 int iLeftMargin = e.MarginBounds.Left;
                 //Set the top margin
@@ -696,166 +742,210 @@ namespace BackorderManagement
                 //For the first page to print set the cell width and header height
                 if (bFirstPage)
                 {
+                    int nColumnCount = 0;
                     foreach (DataGridViewColumn GridCol in dvRemainItemList.Columns)
                     {
-                        iTmpWidth = (int)(Math.Floor((double)((double)GridCol.Width /
-                                       (double)iTotalWidth * (double)iTotalWidth *
-                                       ((double)e.MarginBounds.Width / (double)iTotalWidth))));
+                        if (nColumnCount != 0)
+                        {
+                            iTmpWidth = (int)(Math.Floor((double)((double)GridCol.Width /
+                                           (double)iTotalWidth * (double)iTotalWidth *
+                                           ((double)e.MarginBounds.Width / (double)iTotalWidth))));
 
-                        iHeaderHeight = (int)(e.Graphics.MeasureString(GridCol.HeaderText,
-                                    GridCol.InheritedStyle.Font, iTmpWidth).Height) + 11;
+                            iHeaderHeight = (int)(e.Graphics.MeasureString(GridCol.HeaderText,
+                                        GridCol.InheritedStyle.Font, iTmpWidth).Height) + 11;
+                        }
+                        else
+                        {
+                            iTmpWidth = 0;
+                            iHeaderHeight = 0;
+                        }
 
                         // Save width and height of headres
                         arrColumnLefts.Add(iLeftMargin);
                         arrColumnWidths.Add(iTmpWidth);
                         arrColumnTypes.Add(GridCol.GetType());
                         iLeftMargin += iTmpWidth;
+                        
+                        nColumnCount++;
                     }
                 }
                 //Loop till all the grid rows not get printed
                 while (iRow <= dvRemainItemList.Rows.Count - 1)
                 {
                     DataGridViewRow GridRow = dvRemainItemList.Rows[iRow];
-                    //Set the cell height
-                    iCellHeight = GridRow.Height + 5;
-                    int iCount = 0;
-                    //Check whether the current page settings allo more rows to print
-                    if (iTopMargin + iCellHeight >= e.MarginBounds.Height + e.MarginBounds.Top)
+                    
+                    if (GridRow.Cells[0].Value.ToString() != "False")
                     {
-                        bNewPage = true;
-                        bFirstPage = false;
-                        bMorePagesToPrint = true;
-                        break;
-                    }
-                    else
-                    {
-                        if (bNewPage)
+                        //Set the cell height
+                        iCellHeight = GridRow.Height + 5;
+                        int iCount = 0;
+                        //Check whether the current page settings allo more rows to print
+                        if (iTopMargin + iCellHeight >= e.MarginBounds.Height + e.MarginBounds.Top)
                         {
-                            //Draw Header
-                            e.Graphics.DrawString(strCurrentCustomer, new Font(dvRemainItemList.Font, FontStyle.Bold),
-                                    Brushes.Black, e.MarginBounds.Left, e.MarginBounds.Top -
-                                    e.Graphics.MeasureString(strCurrentCustomer, new Font(dvRemainItemList.Font,
-                                    FontStyle.Bold), e.MarginBounds.Width).Height - 13);
-
-                            String strDate = DateTime.Now.ToLongDateString() + " " + DateTime.Now.ToShortTimeString();
-                            //Draw Date
-                            e.Graphics.DrawString(strDate, new Font(dvRemainItemList.Font, FontStyle.Bold),
-                                    Brushes.Black, e.MarginBounds.Left + (e.MarginBounds.Width -
-                                    e.Graphics.MeasureString(strDate, new Font(dvRemainItemList.Font,
-                                    FontStyle.Bold), e.MarginBounds.Width).Width), e.MarginBounds.Top -
-                                    e.Graphics.MeasureString(strCurrentCustomer, new Font(new Font(dvRemainItemList.Font,
-                                    FontStyle.Bold), FontStyle.Bold), e.MarginBounds.Width).Height - 13);
-
-                            //Draw Columns                 
-                            iTopMargin = e.MarginBounds.Top;
-                            foreach (DataGridViewColumn GridCol in dvRemainItemList.Columns)
-                            {
-                                e.Graphics.FillRectangle(new SolidBrush(Color.LightGray),
-                                    new Rectangle((int)arrColumnLefts[iCount], iTopMargin,
-                                    (int)arrColumnWidths[iCount], iHeaderHeight));
-
-                                e.Graphics.DrawRectangle(Pens.Black,
-                                    new Rectangle((int)arrColumnLefts[iCount], iTopMargin,
-                                    (int)arrColumnWidths[iCount], iHeaderHeight));
-
-                                e.Graphics.DrawString(GridCol.HeaderText, GridCol.InheritedStyle.Font,
-                                    new SolidBrush(GridCol.InheritedStyle.ForeColor),
-                                    new RectangleF((int)arrColumnLefts[iCount], iTopMargin,
-                                    (int)arrColumnWidths[iCount], iHeaderHeight), strFormat);
-                                iCount++;
-                            }
-                            bNewPage = false;
-                            iTopMargin += iHeaderHeight;
+                            bNewPage = true;
+                            bFirstPage = false;
+                            bMorePagesToPrint = true;
+                            break;
                         }
-                        iCount = 0;
-                        //Draw Columns Contents                
-                        foreach (DataGridViewCell Cel in GridRow.Cells)
+                        else
                         {
-                            if (!Cel.OwningColumn.Visible) continue;
+                            if (bNewPage)
+                            {
+                                String strHeaderText = String.Empty;
 
-                            // For the TextBox Column
-                            if (((Type)arrColumnTypes[iCount]).Name == "DataGridViewTextBoxColumn" ||
-                                ((Type)arrColumnTypes[iCount]).Name == "DataGridViewLinkColumn")
-                            {
-                                e.Graphics.DrawString(Cel.Value.ToString(), Cel.InheritedStyle.Font,
-                                        new SolidBrush(Cel.InheritedStyle.ForeColor),
-                                        new RectangleF((int)arrColumnLefts[iCount], (float)iTopMargin,
-                                        (int)arrColumnWidths[iCount], (float)iCellHeight), strFormat);
+                                switch (GetStoreId())
+                                {
+                                    case "sh":
+                                        strHeaderText = "STY - " + strCurrentCustomer;
+                                        break;
+
+                                    case "ray":
+                                        strHeaderText = "UBC - " + strCurrentCustomer;
+                                        break;
+
+                                    case "ugf":
+                                        strHeaderText = "AMC - " + strCurrentCustomer;
+                                        break;
+                                }
+
+                                //Draw Header
+                                e.Graphics.DrawString(strHeaderText, new Font(dvRemainItemList.Font, FontStyle.Bold),
+                                        Brushes.Black, e.MarginBounds.Left, e.MarginBounds.Top -
+                                        e.Graphics.MeasureString(strCurrentCustomer, new Font(dvRemainItemList.Font, FontStyle.Bold), e.MarginBounds.Width).Height - 13);
+
+                                String strDate = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");//.ToLongDateString() + " " + DateTime.Now.ToShortTimeString();
+                                //Draw Date
+                                e.Graphics.DrawString(strDate, new Font(dvRemainItemList.Font, FontStyle.Bold),
+                                        Brushes.Black, e.MarginBounds.Left + (e.MarginBounds.Width -
+                                        e.Graphics.MeasureString(strDate, new Font(dvRemainItemList.Font,
+                                        FontStyle.Bold), e.MarginBounds.Width).Width), e.MarginBounds.Top -
+                                        e.Graphics.MeasureString(strCurrentCustomer, new Font(new Font(dvRemainItemList.Font,
+                                        FontStyle.Bold), FontStyle.Bold), e.MarginBounds.Width).Height - 13);
+
+                                //Draw Columns                 
+                                iTopMargin = e.MarginBounds.Top;
+                                foreach (DataGridViewColumn GridCol in dvRemainItemList.Columns)
+                                {
+                                    if (iCount != 0)
+                                    {
+                                        e.Graphics.FillRectangle(new SolidBrush(Color.LightGray),
+                                            new Rectangle((int)arrColumnLefts[iCount], iTopMargin,
+                                            (int)arrColumnWidths[iCount], iHeaderHeight));
+
+                                        e.Graphics.DrawRectangle(Pens.Black,
+                                            new Rectangle((int)arrColumnLefts[iCount], iTopMargin,
+                                            (int)arrColumnWidths[iCount], iHeaderHeight));
+
+                                        e.Graphics.DrawString(GridCol.HeaderText, GridCol.InheritedStyle.Font,
+                                            new SolidBrush(GridCol.InheritedStyle.ForeColor),
+                                            new RectangleF((int)arrColumnLefts[iCount], iTopMargin,
+                                            (int)arrColumnWidths[iCount], iHeaderHeight), strFormat);
+                                    }
+                                    iCount++;
+                                }
+                                bNewPage = false;
+                                iTopMargin += iHeaderHeight;
                             }
-                            // For the Button Column
-                            else if (((Type)arrColumnTypes[iCount]).Name == "DataGridViewButtonColumn")
+                            iCount = 0;
+                            //Draw Columns Contents                
+                            foreach (DataGridViewCell Cel in GridRow.Cells)
                             {
-                                CellButton.Text = Cel.Value.ToString();
-                                CellButton.Size = new Size((int)arrColumnWidths[iCount], iCellHeight);
-                                Bitmap bmp = new Bitmap(CellButton.Width, CellButton.Height);
-                                CellButton.DrawToBitmap(bmp, new Rectangle(0, 0,
-                                        bmp.Width, bmp.Height));
-                                e.Graphics.DrawImage(bmp, new Point((int)arrColumnLefts[iCount], iTopMargin));
-                            }
-                            // For the CheckBox Column
-                            else if (((Type)arrColumnTypes[iCount]).Name == "DataGridViewCheckBoxColumn")
-                            {
-                                CellCheckBox.Size = new Size(14, 14);
-                                CellCheckBox.Checked = (bool)Cel.Value;
-                                Bitmap bmp = new Bitmap((int)arrColumnWidths[iCount], iCellHeight);
-                                Graphics tmpGraphics = Graphics.FromImage(bmp);
-                                tmpGraphics.FillRectangle(Brushes.White, new Rectangle(0, 0,
-                                        bmp.Width, bmp.Height));
-                                CellCheckBox.DrawToBitmap(bmp,
-                                        new Rectangle((int)((bmp.Width - CellCheckBox.Width) / 2),
-                                        (int)((bmp.Height - CellCheckBox.Height) / 2),
-                                        CellCheckBox.Width, CellCheckBox.Height));
-                                e.Graphics.DrawImage(bmp, new Point((int)arrColumnLefts[iCount], iTopMargin));
-                            }
-                            // For the ComboBox Column
-                            else if (((Type)arrColumnTypes[iCount]).Name == "DataGridViewComboBoxColumn")
-                            {
-                                CellComboBox.Size = new Size((int)arrColumnWidths[iCount], iCellHeight);
-                                Bitmap bmp = new Bitmap(CellComboBox.Width, CellComboBox.Height);
-                                CellComboBox.DrawToBitmap(bmp, new Rectangle(0, 0,
-                                        bmp.Width, bmp.Height));
-                                e.Graphics.DrawImage(bmp, new Point((int)arrColumnLefts[iCount], iTopMargin));
-                                e.Graphics.DrawString(Cel.Value.ToString(), Cel.InheritedStyle.Font,
-                                        new SolidBrush(Cel.InheritedStyle.ForeColor),
-                                        new RectangleF((int)arrColumnLefts[iCount] + 1, iTopMargin, (int)arrColumnWidths[iCount]
-                                        - 16, iCellHeight), StrFormatComboBox);
-                            }
-                            // For the Image Column
-                            else if (((Type)arrColumnTypes[iCount]).Name == "DataGridViewImageColumn")
-                            {
-                                Rectangle CelSize = new Rectangle((int)arrColumnLefts[iCount],
-                                        iTopMargin, (int)arrColumnWidths[iCount], iCellHeight);
-                                Size ImgSize = ((Image)(Cel.FormattedValue)).Size;
-                                e.Graphics.DrawImage((Image)Cel.FormattedValue,
-                                        new Rectangle((int)arrColumnLefts[iCount] + (int)((CelSize.Width - 100) / 2),
-                                        iTopMargin + (int)((CelSize.Height - 150) / 2),
-                                        100, 150));
+                                if (!Cel.OwningColumn.Visible) continue;
+
+                                if (((Type)arrColumnTypes[iCount]).Name != "DataGridViewCheckBoxColumn")
+                                {
+                                    // For the TextBox Column
+                                    if (((Type)arrColumnTypes[iCount]).Name == "DataGridViewTextBoxColumn" ||
+                                        ((Type)arrColumnTypes[iCount]).Name == "DataGridViewLinkColumn")
+                                    {
+                                        e.Graphics.DrawString(Cel.Value.ToString(), Cel.InheritedStyle.Font,
+                                                new SolidBrush(Cel.InheritedStyle.ForeColor),
+                                                new RectangleF((int)arrColumnLefts[iCount], (float)iTopMargin,
+                                                (int)arrColumnWidths[iCount], (float)iCellHeight), strFormat);
+                                    }
+                                    // For the Button Column
+                                    else if (((Type)arrColumnTypes[iCount]).Name == "DataGridViewButtonColumn")
+                                    {
+                                        CellButton.Text = Cel.Value.ToString();
+                                        CellButton.Size = new Size((int)arrColumnWidths[iCount], iCellHeight);
+                                        Bitmap bmp = new Bitmap(CellButton.Width, CellButton.Height);
+                                        CellButton.DrawToBitmap(bmp, new Rectangle(0, 0,
+                                                bmp.Width, bmp.Height));
+                                        e.Graphics.DrawImage(bmp, new Point((int)arrColumnLefts[iCount], iTopMargin));
+                                    }
+                                    // For the CheckBox Column
+                                    else if (((Type)arrColumnTypes[iCount]).Name == "DataGridViewCheckBoxColumn")
+                                    {
+                                        //CellCheckBox.Size = new Size(14, 14);
+                                        //CellCheckBox.Checked = (bool)Cel.Value;
+                                        //Bitmap bmp = new Bitmap((int)arrColumnWidths[iCount], iCellHeight);
+                                        //Graphics tmpGraphics = Graphics.FromImage(bmp);
+                                        //tmpGraphics.FillRectangle(Brushes.White, new Rectangle(0, 0,
+                                        //        bmp.Width, bmp.Height));
+                                        //CellCheckBox.DrawToBitmap(bmp,
+                                        //        new Rectangle((int)((bmp.Width - CellCheckBox.Width) / 2),
+                                        //        (int)((bmp.Height - CellCheckBox.Height) / 2),
+                                        //        CellCheckBox.Width, CellCheckBox.Height));
+                                        //e.Graphics.DrawImage(bmp, new Point((int)arrColumnLefts[iCount], iTopMargin));
+                                        e.Graphics.DrawString("", Cel.InheritedStyle.Font,
+                                                new SolidBrush(Cel.InheritedStyle.ForeColor),
+                                                new RectangleF((int)arrColumnLefts[iCount], (float)iTopMargin,
+                                                (int)arrColumnWidths[iCount], (float)iCellHeight), strFormat);
+                                    }
+                                    // For the ComboBox Column
+                                    else if (((Type)arrColumnTypes[iCount]).Name == "DataGridViewComboBoxColumn")
+                                    {
+                                        CellComboBox.Size = new Size((int)arrColumnWidths[iCount], iCellHeight);
+                                        Bitmap bmp = new Bitmap(CellComboBox.Width, CellComboBox.Height);
+                                        CellComboBox.DrawToBitmap(bmp, new Rectangle(0, 0,
+                                                bmp.Width, bmp.Height));
+                                        e.Graphics.DrawImage(bmp, new Point((int)arrColumnLefts[iCount], iTopMargin));
+                                        e.Graphics.DrawString(Cel.Value.ToString(), Cel.InheritedStyle.Font,
+                                                new SolidBrush(Cel.InheritedStyle.ForeColor),
+                                                new RectangleF((int)arrColumnLefts[iCount] + 1, iTopMargin, (int)arrColumnWidths[iCount]
+                                                - 16, iCellHeight), StrFormatComboBox);
+                                    }
+                                    // For the Image Column
+                                    else if (((Type)arrColumnTypes[iCount]).Name == "DataGridViewImageColumn")
+                                    {
+                                        Rectangle CelSize = new Rectangle((int)arrColumnLefts[iCount],
+                                                iTopMargin, (int)arrColumnWidths[iCount], iCellHeight);
+                                        Size ImgSize = ((Image)(Cel.FormattedValue)).Size;
+                                        e.Graphics.DrawImage((Image)Cel.FormattedValue,
+                                                new Rectangle((int)arrColumnLefts[iCount] + (int)((CelSize.Width - 100) / 2),
+                                                iTopMargin + (int)((CelSize.Height - 150) / 2),
+                                                100, 150));
                                         //((Image)(Cel.FormattedValue)).Width, ((Image)(Cel.FormattedValue)).Height));
 
+                                    }
+
+                                    // Drawing Cells Borders 
+                                    e.Graphics.DrawRectangle(Pens.Black, new Rectangle((int)arrColumnLefts[iCount],
+                                            iTopMargin, (int)arrColumnWidths[iCount], iCellHeight));
+                                }
+
+                                iCount++;
+
+                                //if (Cel.Value != null)
+                                //{
+                                //    e.Graphics.DrawString(Cel.Value.ToString(), Cel.InheritedStyle.Font,
+                                //                new SolidBrush(Cel.InheritedStyle.ForeColor),
+                                //                new RectangleF((int)arrColumnLefts[iCount], (float)iTopMargin,
+                                //                (int)arrColumnWidths[iCount], (float)iCellHeight), strFormat);
+                                //}
+                                ////Drawing Cells Borders 
+                                //e.Graphics.DrawRectangle(Pens.Black, new Rectangle((int)arrColumnLefts[iCount],
+                                //        iTopMargin, (int)arrColumnWidths[iCount], iCellHeight));
+
+                                //iCount++;
                             }
-
-                            // Drawing Cells Borders 
-                            e.Graphics.DrawRectangle(Pens.Black, new Rectangle((int)arrColumnLefts[iCount],
-                                    iTopMargin, (int)arrColumnWidths[iCount], iCellHeight));
-
-                            iCount++;
-
-                            //if (Cel.Value != null)
-                            //{
-                            //    e.Graphics.DrawString(Cel.Value.ToString(), Cel.InheritedStyle.Font,
-                            //                new SolidBrush(Cel.InheritedStyle.ForeColor),
-                            //                new RectangleF((int)arrColumnLefts[iCount], (float)iTopMargin,
-                            //                (int)arrColumnWidths[iCount], (float)iCellHeight), strFormat);
-                            //}
-                            ////Drawing Cells Borders 
-                            //e.Graphics.DrawRectangle(Pens.Black, new Rectangle((int)arrColumnLefts[iCount],
-                            //        iTopMargin, (int)arrColumnWidths[iCount], iCellHeight));
-
-                            //iCount++;
                         }
                     }
+
                     iRow++;
-                    iTopMargin += iCellHeight;
+
+                    if (GridRow.Cells[0].Value.ToString() != "False")
+                        iTopMargin += iCellHeight;
                 }
 
                 //If more lines exist, print another page.
@@ -871,5 +961,38 @@ namespace BackorderManagement
         }
 
         #endregion
+
+        private void txtSearchStyle_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                dvStyleList.Rows.Clear();
+
+                if (!String.IsNullOrEmpty(txtSearchStyle.Text))
+                {
+                    MySqlDataManager dm = new MySqlDataManager(strConnectString);
+                    DataTable dt = dm.GetStyleListFromSearchType(GetStoreId(), "0", txtSearchStyle.Text); // 0 = style number
+
+                    if (dt != null && dt.Rows.Count > 0)
+                    {
+                        for (int i = 0; i < dt.Rows.Count; i++)
+                        {
+                            dvStyleList.Rows.Add(
+                                dt.Rows[i]["VenderName"].ToString(),
+                                dt.Rows[i]["StyleNo"].ToString(),
+                                dt.Rows[i]["OnSale"].ToString() == "1" ? "Yes" : "No"
+                                );
+                        }
+
+                        dvStyleList.Rows[0].Cells[0].Selected = false;
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Type search value.");
+                }
+            }
+
+        }
     }
 }

@@ -38,6 +38,7 @@
             this.label1 = new System.Windows.Forms.Label();
             this.txtStyleNo = new System.Windows.Forms.TextBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.cbOnSale = new System.Windows.Forms.CheckBox();
             this.txtQuantity = new System.Windows.Forms.NumericUpDown();
             this.btnSaveChanges = new System.Windows.Forms.Button();
             this.label8 = new System.Windows.Forms.Label();
@@ -69,7 +70,6 @@
             this.removeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.cbStoreList = new System.Windows.Forms.ComboBox();
             this.txtEstimateQuantity = new System.Windows.Forms.NumericUpDown();
-            this.cbOnSale = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.dvStyleList)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.groupBox1.SuspendLayout();
@@ -135,6 +135,7 @@
             this.txtSearch.Name = "txtSearch";
             this.txtSearch.Size = new System.Drawing.Size(179, 21);
             this.txtSearch.TabIndex = 72;
+            this.txtSearch.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtSearch_KeyDown);
             // 
             // btnSearch
             // 
@@ -185,6 +186,16 @@
             this.groupBox1.TabIndex = 76;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Style info";
+            // 
+            // cbOnSale
+            // 
+            this.cbOnSale.AutoSize = true;
+            this.cbOnSale.Location = new System.Drawing.Point(237, 238);
+            this.cbOnSale.Name = "cbOnSale";
+            this.cbOnSale.Size = new System.Drawing.Size(69, 16);
+            this.cbOnSale.TabIndex = 88;
+            this.cbOnSale.Text = "On Sale";
+            this.cbOnSale.UseVisualStyleBackColor = true;
             // 
             // txtQuantity
             // 
@@ -457,16 +468,6 @@
             this.txtEstimateQuantity.Name = "txtEstimateQuantity";
             this.txtEstimateQuantity.Size = new System.Drawing.Size(69, 21);
             this.txtEstimateQuantity.TabIndex = 88;
-            // 
-            // cbOnSale
-            // 
-            this.cbOnSale.AutoSize = true;
-            this.cbOnSale.Location = new System.Drawing.Point(237, 238);
-            this.cbOnSale.Name = "cbOnSale";
-            this.cbOnSale.Size = new System.Drawing.Size(69, 16);
-            this.cbOnSale.TabIndex = 88;
-            this.cbOnSale.Text = "On Sale";
-            this.cbOnSale.UseVisualStyleBackColor = true;
             // 
             // StyleManage
             // 
