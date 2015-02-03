@@ -26,12 +26,12 @@ namespace Styleholic.DataManager
             Connection.Open();
         }
 
-        public bool ExistOrderInfo(String strOrderID, String strColor)
+        public bool ExistOrderInfo(String strOrderID, String strStyleNo, String strColor, String strCustomerID)
         {
             bool bRetVal = false;
 
             DataTable dt = new DataTable();
-            string query = "Select * from orderiteminfo where OrderId = '" + strOrderID + "' AND color = '" + strColor + "';";
+            string query = "Select * from orderiteminfo where OrderId = '" + strOrderID + "' AND StyleNo = '" + strStyleNo + "' AND color = '" + strColor + "' AND CustomerId = '" + strCustomerID + "';";
             MySqlCommand cmd = new MySqlCommand(query, Connection);
             MySqlDataReader dr = cmd.ExecuteReader();
 
@@ -319,6 +319,7 @@ namespace Styleholic.DataManager
                             + " FROM	orderiteminfo a"
                             + " INNER JOIN orderinfo b ON a.OrderId = b.OrderId"
                             + " WHERE StyleNo = '" + strStyleNo + "'"
+                            + " AND a.IsPacked != '2'"
                             + " )a"
                             + " GROUP BY Color, OrderDate"
                             + " ORDER BY OrderDate ASC, Color ASC;";
